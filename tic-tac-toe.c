@@ -19,17 +19,32 @@ char **create_board(int size)
 
 void print_board(char **board, int size)
 {
+  // Print column labels
+  printf(" ");
+  for (int i = 0; i < size; i++)
+    printf(" %d", i + 1);
+  printf("\n");
+
   for (int i = 0; i < size; i++)
   {
+    // Print row label
+    printf("%d ", i + 1);
+
+    // Print board item
     for (int j = 0; j < size; j++)
     {
       printf("%c", board[i][j]);
+
+      // Print vertical lines
       if (j != size - 1)
         printf("|");
     }
     printf("\n");
+
+    // Print horizontal lines
     if (i != size - 1)
     {
+      printf("  ");
       for (int j = 0; j < size; j++)
       {
         printf("-");
