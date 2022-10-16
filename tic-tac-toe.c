@@ -129,6 +129,20 @@ char swap_piece(char current_piece)
   return 'X';
 }
 
+int get_input(char* dimension, int player_number, int size)
+{
+  int result;
+  printf("Player %d, enter a %s: ", player_number, dimension);
+  scanf("%d", &result);
+  while (result < 0 || result > size)
+  {
+    printf("%d is not a valid %s number. Please try again...\n", result, dimension);
+    printf("Player %d, enter a different %s: ", player_number, dimension);
+    scanf("%d", &result);
+  }
+  return result;
+}
+
 int main()
 {
   int size = 3;
@@ -149,23 +163,8 @@ int main()
 
     do
     {
-      printf("Player %d, enter a row: ", player_number);
-      scanf("%d", &row);
-      while (row < 0 || row > size)
-      {
-        printf("Row %d is not a valid row. Please try again...\n", row);
-        printf("Player %d, enter a different row: ", player_number);
-        scanf("%d", &row);
-      }
-
-      printf("Player %d, enter a column: ", player_number);
-      scanf("%d", &column);
-      while (column < 0 || column > size)
-      {
-        printf("Column %d is not a valid column. Please try again...\n", row);
-        printf("Player %d, enter a different column: ", player_number);
-        scanf("%d", &column);
-      }
+      row = get_input("row", player_number, size);
+      column = get_input("column", player_number, size);
 
       if (board[row - 1][column - 1] != ' ')
         printf("That is not an empty spot on the board. Please try again...\n\n");
