@@ -3,8 +3,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#define true 1 
-#define false 0 
+#define true 1
+#define false 0
 
 char **create_board(int size)
 {
@@ -56,30 +56,64 @@ void print_board(char **board, int size)
   }
 }
 
-int is_win(char** board, int size, int moveRow, int moveColumn)
+int is_win(char **board, int size, int move_row, int move_column)
 {
-  char symbol = board[moveRow][moveColumn];
+  char symbol = board[move_row - 1][move_column - 1];
 
   // Check row
+  int win = true;
   for (int i = 0; i < size; i++)
-    if (board[moveRow][i] != symbol)
-      return false;
-  
-  // Check column
-  for (int i = 0; i < size; i++)
-    if (board[i][moveColumn] != symbol)
-      return false;
+    if (board[move_row - 1][i] != symbol)
+    {
+      win = false;
+      break;
+    }
+  if (win)
+    return true;
 
-  // Check diagonal (if applicable)
-  if (moveRow == moveColumn)
+  // Check column
+  win = true;
+  for (int i = 0; i < size; i++)
+    if (board[i][move_column - 1] != symbol)
+    {
+      win = false;
+      break;
+    }
+  if (win)
+    return true;
+
+  // Check main diagonal (if applicable)
+  win = true;
+  if (move_row == move_column)
+  {
     for (int i = 0; i < size; i++)
       if (board[i][i] != symbol)
-        return false;
+      {
+        win = false;
+        break;
+      }
+    if (win)
+      return true;
+  }
 
-  return true;
+  // Check anti-diagonal (if applicable)
+  win = true;
+  if (move_row + move_column - 1 == size)
+  {
+    for (int i = 0; i < size; i++)
+      if (board[i][size - 1 - i] != symbol)
+      {
+        win = false;
+        break;
+      }
+    if (win)
+      return true;
+  }
+
+  return false;
 }
 
-int is_tie(char** board, int size, int moveRow, int moveColumn)
+int is_tie(char **board, int size, int moveRow, int moveColumn)
 {
   for (int i = 0; i < size; i++)
     for (int j = 0; j < size; j++)
@@ -99,35 +133,70 @@ int main()
 {
   int size = 3;
   char **board = create_board(size);
-  int move_counter = 1;
+  int move_counter = 0;
   char current_piece = 'X';
+
+  int row = -1;
+  int column = -1;
 
   // Assume that the players enter valid integers
   while (move_counter < size * size)
   {
-    int player_number = move_counter % 2;
-    int row = -1;
-    int column = -1;
-    printf("Player %d, enter a row: ", player_number);
-    scanf("%d", &row);
-    while (row < 0 || row > size)
+    int player_number = move_counter % 2 + 1;
+
+    print_board(board, size);
+    printf("\n");
+
+    do
     {
-      printf("Row %d is not a valid row. Please try again...\n", row);
-      printf("Player %d, enter a different row: ", player_number);
+      printf("Player %d, enter a row: ", player_number);
       scanf("%d", &row);
-    }
-    printf("Player %d, enter a column: ", player_number);
-    scanf("%d", &column);
-    while (column < 0 || column > size)
-    {
-      printf("Column %d is not a valid row. Please try again...\n", row);
-      printf("Player %d, enter a different column: ", player_number);
+      while (row < 0 || row > size)
+      {
+        printf("Row %d is not a valid row. Please try again...\n", row);
+        printf("Player %d, enter a different row: ", player_number);
+        scanf("%d", &row);
+      }
+
+      printf("Player %d, enter a column: ", player_number);
       scanf("%d", &column);
+      while (column < 0 || column > size)
+      {
+        printf("Column %d is not a valid column. Please try again...\n", row);
+        printf("Player %d, enter a different column: ", player_number);
+        scanf("%d", &column);
+      }
+
+      if (board[row - 1][column - 1] != ' ')
+        printf("That is not an empty spot on the board. Please try again...\n\n");
+      else
+        printf("\n");
+
+    } while (board[row - 1][column - 1] != ' ');
+
+    // Place the piece on the board
+    board[row - 1][column - 1] = current_piece;
+
+    if (is_win(board, size, row, column))
+    {
+      print_board(board, size);
+      printf("Player %d wins!\n", player_number);
+      move_counter = 10;
     }
-    printf("%d %d\n", row, column);
+
+    if (current_piece == 'X')
+      current_piece = 'O';
+    else
+      current_piece = 'X';
+    move_counter++;
   }
 
-  print_board(board, size);
+  if (is_tie(board, size, row, column))
+  {
+    print_board(board, size);
+    printf("Tie game.\n");
+  }
+
   for (int i = 0; i < size; i++)
     free(board[i]);
   free(board);
