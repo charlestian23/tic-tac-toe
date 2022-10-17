@@ -11,8 +11,8 @@ char **create_board(int size)
   char **board = (char **)calloc(size, sizeof(char *));
   for (int i = 0; i < size; i++)
   {
-    board[i] = (char *)calloc(size, sizeof(char));
-    memset(board[i], ' ', size);
+    *(board + i) = (char *)calloc(size, sizeof(char));
+    memset(*(board + i), ' ', size);
   }
   return board;
 }
@@ -33,7 +33,7 @@ void print_board(char **board, int size)
     // Print board item
     for (int j = 0; j < size; j++)
     {
-      printf("%c", board[i][j]);
+      printf("%c", *(*(board + i) + j));
 
       // Print vertical lines
       if (j != size - 1)
@@ -63,7 +63,7 @@ int is_win(char **board, int size, int move_row, int move_column)
   // Check row
   int win = true;
   for (int i = 0; i < size; i++)
-    if (board[move_row - 1][i] != symbol)
+    if (*(*(board + move_row - 1) + i) != symbol)
     {
       win = false;
       break;
@@ -74,7 +74,7 @@ int is_win(char **board, int size, int move_row, int move_column)
   // Check column
   win = true;
   for (int i = 0; i < size; i++)
-    if (board[i][move_column - 1] != symbol)
+    if (*(*(board + i) + move_column - 1) != symbol)
     {
       win = false;
       break;
@@ -87,7 +87,7 @@ int is_win(char **board, int size, int move_row, int move_column)
   if (move_row == move_column)
   {
     for (int i = 0; i < size; i++)
-      if (board[i][i] != symbol)
+      if (*(*(board + i) + i) != symbol)
       {
         win = false;
         break;
@@ -101,7 +101,7 @@ int is_win(char **board, int size, int move_row, int move_column)
   if (move_row + move_column - 1 == size)
   {
     for (int i = 0; i < size; i++)
-      if (board[i][size - 1 - i] != symbol)
+      if (*(*(board + i) + size - 1 - i) != symbol)
       {
         win = false;
         break;
@@ -117,7 +117,7 @@ int is_tie(char **board, int size, int moveRow, int moveColumn)
 {
   for (int i = 0; i < size; i++)
     for (int j = 0; j < size; j++)
-      if (board[i][j] == ' ')
+      if (*(*(board + i)) + j == ' ')
         return false;
   return !is_win(board, size, moveRow, moveColumn);
 }
@@ -129,7 +129,7 @@ char swap_piece(char current_piece)
   return 'X';
 }
 
-int get_input(char* dimension, int player_number, int size)
+int get_input(char *dimension, int player_number, int size)
 {
   int result;
   printf("Player %d, enter a %s: ", player_number, dimension);
@@ -166,15 +166,15 @@ int main()
       row = get_input("row", player_number, size);
       column = get_input("column", player_number, size);
 
-      if (board[row - 1][column - 1] != ' ')
+      if (*(*(board + row - 1) + column - 1) != ' ')
         printf("That is not an empty spot on the board. Please try again...\n\n");
       else
         printf("\n");
 
-    } while (board[row - 1][column - 1] != ' ');
+    } while (*(*(board + row - 1) + column - 1) != ' ');
 
     // Place the piece on the board
-    board[row - 1][column - 1] = current_piece;
+    *(*(board + row - 1) + column - 1) = current_piece;
 
     if (is_win(board, size, row, column))
     {
@@ -197,7 +197,7 @@ int main()
   }
 
   for (int i = 0; i < size; i++)
-    free(board[i]);
+    free(*(board + i));
   free(board);
 
   return EXIT_SUCCESS;
